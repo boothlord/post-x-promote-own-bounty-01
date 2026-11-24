@@ -50,3 +50,13 @@ if (
 mkdirSync(outputDir, { recursive: true });
 copyFileSync(postPath, join(outputDir, "POST.json"));
 copyFileSync(join(botDir, "post-image.jpg"), join(outputDir, "post-image.jpg"));
+
+// Read the copy back and compare it byte for byte with the source:
+// the gate reads the post from the address in out/POST.json, so a
+// copy that differs from the committed POST.json in any byte must
+// fail loudly here instead of handing the house a wrong address.
+const handedOver = readFileSync(join(outputDir, "POST.json"));
+if (!handedOver.equals(readFileSync(postPath))) {
+  console.error("out/POST.json differs from POST.json after copying");
+  process.exit(1);
+}
